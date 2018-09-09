@@ -9,12 +9,20 @@ import javax.swing.*;
  * Contains all the game play logic related to the minesweeper game
  * @author Alex Retief
  */
-public class Game extends MineField {
+public class Game {
     private int correctFlags;
+    private MineField mf;
     
     public Game() {
-        super();
         correctFlags = 0;
+        mf = new MineField();
+    }
+    
+    public void newGame(JFrame frame) {
+        mf.createField();
+        frame.add(mf.getPanel());
+        createActionEvents();
+        createFlagEvents();
     }
     
     /*
@@ -26,9 +34,9 @@ public class Game extends MineField {
      */
     public void lose() {
         System.out.println("YOU LOSE");
-        for(int i = 0; i < getHorizLength(); i++) {
-            for(int j = 0; j < getVertLength(); j++) {
-                getButton(i, j).setEnabled(false);
+        for(int i = 0; i < mf.getHorizLength(); i++) {
+            for(int j = 0; j < mf.getVertLength(); j++) {
+                mf.getButton(i, j).setEnabled(false);
             }
         }
     }
@@ -41,7 +49,7 @@ public class Game extends MineField {
     }
     
     public void checkWin() {
-        if(getCorrectFlags() == getNoOfMines()) {
+        if(correctFlags == mf.getNoOfMines()) {
             win();
         }
     }
@@ -51,21 +59,18 @@ public class Game extends MineField {
      * upon them
      * @param btns The two dimensional array of buttons on the grid
      * @param btnInfo The two dimensional array of info related to each button
-     * @param horizLength The maximum length of the grid row
-     * @param vertLength The maximum length of the grid column
      */
-    public void createActionEvents(JButton[][] btns) {
-        for(int i = 0; i < getHorizLength(); i++) {
-            for(int j = 0; j < getVertLength(); j++) {
+    public void createActionEvents() {
+        for(int i = 0; i < mf.getHorizLength(); i++) {
+            for(int j = 0; j < mf.getVertLength(); j++) {
                 final int ii = i;
                 final int jj = j;
-                final String btnText = getButtonInfo(ii, jj);
-                System.out.println(btnText);
+                final String btnText = mf.getButtonInfo(ii, jj);
                 
                 if(btnText.equals("M")) {
-                    btns[ii][jj].addActionListener(new ActionListener() {
+                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            System.out.println("M");
+                            //System.out.println("M");
                             JButton btn = (JButton) e.getSource();
                             btn.setText(btnText);
                             btn.setEnabled(false);
@@ -73,16 +78,16 @@ public class Game extends MineField {
                         }
                     });
                 } else if(btnText.equals("")){
-                    btns[ii][jj].addActionListener(new ActionListener() {
+                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            System.out.println("0");
+                            //System.out.println("0");
                             expandSafeZone(ii, jj);
                         }
                     });
                 } else {
-                    btns[ii][jj].addActionListener(new ActionListener() {
+                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            System.out.println("123");
+                            //System.out.println("123");
                             JButton btn = (JButton) e.getSource();
                             btn.setText(btnText);
                             btn.setEnabled(false);
@@ -97,19 +102,18 @@ public class Game extends MineField {
      * Grants each button the ability to have flags through right clicking
      * @param btns The two dimensional array of buttons on the grid
      * @param btnInfo The two dimensional array of info related to each button
-     * @param horizLength The maximum length of the grid row
-     * @param vertLength The maximum length of the grid column
      */
-    public void createFlagEvents(JButton[][] btns) {
-        for(int i = 0; i < getHorizLength(); i++) {
-            for(int j = 0; j < getVertLength(); j++) {
-                final String btnText = getButtonInfo(i, j);
-                btns[i][j].addMouseListener(new MouseAdapter() {
+    public void createFlagEvents() {
+        for(int i = 0; i < mf.getHorizLength(); i++) {
+            for(int j = 0; j < mf.getVertLength(); j++) {
+                final String btnText = mf.getButtonInfo(i, j);
+                mf.getButton(i, j).addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         if(e.getButton() == MouseEvent.BUTTON3) {
                             JButton btn = (JButton) e.getSource();
                             if(!btn.getText().equals("F")) {
                                 btn.setText("F");
+                                checkWin();
                             } else {
                                 btn.setText(btnText);
                             }
@@ -129,20 +133,20 @@ public class Game extends MineField {
      * @param j The y coordinate of the chosen button
      */
     public void expandSafeZone(int i, int j) {
-        getButton(i, j).setEnabled(false);
+        mf.getButton(i, j).setEnabled(false);
         for(int ii = i-1; ii <= i+1; ii++) {
             for(int jj = j-1; jj <= j+1; jj++) {
                 if(!(ii == i && jj == j)) {
                     try {
-                        if(getButtonInfo(ii, jj).equals("") &&
-                                getButton(ii, jj).isEnabled()) { 
-                            getButton(ii, jj).setEnabled(false);
+                        if(mf.getButtonInfo(ii, jj).equals("") &&
+                                mf.getButton(ii, jj).isEnabled()) { 
+                            mf.getButton(ii, jj).setEnabled(false);
                             expandSafeZone(ii, jj);
-                        } else if(getButtonInfo(ii, jj).equals("M")) {
+                        } else if(mf.getButtonInfo(ii, jj).equals("M")) {
                             // Keep mine hidden by doing nothing
                         } else {
-                            setButtonText(getButtonInfo(ii, jj), ii, jj);
-                            getButton(ii, jj).setEnabled(false);
+                            mf.setButtonText(mf.getButtonInfo(ii, jj), ii, jj);
+                            mf.getButton(ii, jj).setEnabled(false);
                         }
                     } catch(ArrayIndexOutOfBoundsException exception) {
                         // ignore buttons referenced outside the grid border
@@ -150,13 +154,5 @@ public class Game extends MineField {
                 }
             }
         }
-    }
-    
-    public int getCorrectFlags() {
-        return correctFlags;
-    }
-    
-    public void addCorrectFlag() {
-        correctFlags++;
     }
 }

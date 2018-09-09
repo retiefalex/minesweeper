@@ -15,6 +15,7 @@ public class MineField {
     
     private JButton[][] btns;
     private String[][] btnInfo;
+    private JPanel pnl;
     
     /*
      * Contructs MineField class and provides the default medium difficulty 
@@ -27,6 +28,7 @@ public class MineField {
         
         btns = new JButton[horizLength][vertLength];
         btnInfo = new String[horizLength][vertLength];
+        pnl = new JPanel();
         
         for(int i = 0; i < horizLength; i++) {   
             for(int j = 0; j < vertLength; j++) {
@@ -40,26 +42,22 @@ public class MineField {
      * Create grid of buttons to be placed on the panel
      * @param pnl The panel the grid of buttons is to be added to
      */
-    public void createField(JPanel pnl, Game game) {
+    public void createField() {
         /*
          * Generates a grid of user-specified dimensions  with a horizontal and
          * vertical gap of 5 between each element
          */
-        GridLayout layout = new GridLayout(getHorizLength(), getVertLength(), 
-                5, 5);
+        GridLayout layout = new GridLayout(horizLength, vertLength, 5, 5);
         pnl.setLayout(layout);
         
         // Add buttons to grid
-        for(int i = 0; i < getHorizLength(); i++) {   
-            for(int j = 0; j < getVertLength(); j++) {
-                pnl.add(getButton(i, j));
+        for(int i = 0; i < horizLength; i++) {   
+            for(int j = 0; j < vertLength; j++) {
+                pnl.add(btns[i][j]);
             }
         }
         createMines();
-        createNumberedSpaces();
-        game.createActionEvents(getButtonGrid());
-        game.createFlagEvents(getButtonGrid());
-        game.checkWin();
+        createNumberedSpaces();    
     }
     
     /*
@@ -71,13 +69,13 @@ public class MineField {
         int ranHoriz;
         int ranVert;
         
-        for(int i = 0; i < getNoOfMines(); i++) {
+        for(int i = 0; i < noOfMines; i++) {
             do {
-                ranHoriz = (int) Math.floor(Math.random()*getHorizLength());
-                ranVert = (int) Math.floor(Math.random()*getVertLength());
-            } while(getButtonInfo(ranHoriz, ranVert).equals("M")); 
-            setButtonInfo("M", ranHoriz, ranVert);
-            setButtonText(getButtonInfo(ranHoriz, ranVert), ranHoriz, ranVert);
+                ranHoriz = (int) Math.floor(Math.random()*horizLength);
+                ranVert = (int) Math.floor(Math.random()*vertLength);
+            } while(btnInfo[ranHoriz][ranVert].equals("M")); 
+            btnInfo[ranHoriz][ranVert] = "M";
+            //btns[ranHoriz][ranVert].setText(btnInfo[ranHoriz][ranVert]);
         }
     }
     
@@ -87,13 +85,13 @@ public class MineField {
      * @param game The class representing the game actions 
      */  
     public void createNumberedSpaces() {
-        for(int i = 0; i < getHorizLength(); i++) {   
-            for(int j = 0; j < getVertLength(); j++) {
-                if(!getButtonInfo(i, j).equals("M")) {
+        for(int i = 0; i < horizLength; i++) {   
+            for(int j = 0; j < vertLength; j++) {
+                if(!btnInfo[i][j].equals("M")) {
                     int mineCounter = countMines(i, j);
                     if(mineCounter != 0) {
-                        setButtonInfo(Integer.toString(mineCounter), i, j);
-                        setButtonText(getButtonInfo(i, j), i, j);
+                        btnInfo[i][j] = Integer.toString(mineCounter);
+                        //btns[i][j].setText(btnInfo[i][j]);
                     }
                 }
             }
@@ -114,7 +112,7 @@ public class MineField {
             for(int jj = j-1; jj <= j+1; jj++) {
                 if(!(ii == i && jj == j)) {
                     try {
-                        if(getButtonInfo(ii, jj).equals("M")) {
+                        if(btnInfo[ii][jj].equals("M")) {
                             mineCounter++;
                         }
                     } catch(ArrayIndexOutOfBoundsException exception) {
@@ -172,5 +170,9 @@ public class MineField {
     
     public void setButtonInfo(String text, int x, int y) {
         btnInfo[x][y] = text;
+    }
+    
+    public JPanel getPanel() {
+        return pnl;
     }
 }

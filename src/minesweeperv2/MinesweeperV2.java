@@ -17,14 +17,11 @@ public class MinesweeperV2 {
      */
     public MinesweeperV2() {
         makeFrame();
-        makeMenuBar(frame);
+        makeMenuBar(frame);      
         
-        MineField minefield = new MineField();
+        // Create instance of minefield here 
         Game game = new Game();
-        
-        JPanel pnl = new JPanel();
-        frame.add(pnl); 
-        minefield.createField(pnl, game);
+        game.newGame(frame);
     }
 
     /*
