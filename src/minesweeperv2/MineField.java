@@ -23,8 +23,8 @@ public class MineField {
      */
     public MineField() {
         noOfMines = 5;
-        vertLength = 25;
-        horizLength = 35;
+        vertLength = 5;
+        horizLength = 10;
         
         btns = new JButton[vertLength][horizLength];
         btnInfo = new String[vertLength][horizLength];
@@ -42,14 +42,14 @@ public class MineField {
      * Create grid of buttons to be placed on the panel
      * @param pnl The panel the grid of buttons is to be added to
      */
-    public void createField() {
+    public void createField(Dimension frameSize) {
         /*
          * Generates a grid of user-specified dimensions  with a horizontal and
          * vertical gap of 5 between each element
          */
         GridLayout layout = new GridLayout(vertLength, horizLength, 5, 5);
         pnl.setLayout(layout);
-        pnl.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        pnl.setSize(frameSize);
         
         // Add buttons to grid
         for(int i = 0; i < vertLength; i++) {   

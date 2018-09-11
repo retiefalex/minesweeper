@@ -12,35 +12,32 @@ import javax.swing.*;
 public class Game {
     private int correctFlags;
     private MineField mf;
-    JLayeredPane pane;
+    private JLayeredPane pane;
+    private Dimension frameSize;
     
     public Game() {
         correctFlags = 0;
         mf = new MineField();
         pane = new JLayeredPane();
-
+        frameSize = new Dimension();
     }
     
     /*
      * Starts a new game by creating a minefield and setting up action events
      * @param frame The frame that the minefield will be added to
      */
-    public void newGame(JFrame frame) {
+    public void newGame(JFrame frame) {    
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frameSize = frame.getSize();
+        
         // Remove title screen to make way for layered pane
         frame.getContentPane().removeAll();
         frame.add(pane);
-        mf.createField();
-        pane.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
-        pane.add(mf.getPanel(), 0, 0);
-        
-        /* 
-         * As panels are not set using preferred size, this method does not
-         * resize the frame when called. The setExtendedState method is used
-         * to combat this.
-         */
+        mf.createField(frameSize);
+        pane.setPreferredSize(frameSize);
+        pane.add(mf.getPanel(), 0, 0);       
         frame.pack();
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-        
+
         createActionEvents();
         createFlagEvents();
     }
@@ -48,7 +45,15 @@ public class Game {
     public void createFinishMsg(String msg) {
         JPanel finishPnl = new JPanel();
         JLabel finishLbl = new JLabel(msg);
-        finishPnl.setSize(new Dimension(400, 200));
+        int width = (int)frameSize.getWidth();
+        int height = (int)frameSize.getHeight();
+        finishLbl.setFont(new Font(null, Font.PLAIN, 40));
+        
+        // Gridbag layout centres the label
+        finishPnl.setLayout(new GridBagLayout());
+        finishPnl.setBounds(0, 0, width, height);
+        finishPnl.setOpaque(false);
+        
         finishPnl.add(finishLbl);
         pane.add(finishPnl, 1, 0);
     }
@@ -57,9 +62,9 @@ public class Game {
      * Conducts the lose sequence once a mine has been pushed by the player
      */
     public void lose() {
-        System.out.println("YOU LOSE");
+        System.out.println("YOU LOSE!");
         mf.disableButtons();
-        createFinishMsg("YOU LOSE");
+        createFinishMsg("YOU LOSE!");
     }
     
     /*
@@ -68,9 +73,9 @@ public class Game {
      */
     public void checkWin() {
         if(correctFlags == mf.getNoOfMines()) {
-            System.out.println("You win");
+            System.out.println("YOU WIN!");
             mf.disableButtons();
-            createFinishMsg("YOU LOSE");
+            createFinishMsg("YOU WIN!");
         }
     }
     

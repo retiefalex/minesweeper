@@ -13,6 +13,7 @@ import javax.swing.*;
  */
 public class MinesweeperV2 {
     private JFrame frame;
+    private Dimension screenSize;
     
     /*
      * Creates the minesweeper game and shows it on screen
@@ -29,6 +30,8 @@ public class MinesweeperV2 {
         
         // Set window size to account for different panel preferred sizes
         frame.pack();
+        
+        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     }
 
     /*
