@@ -10,8 +10,8 @@ import javax.swing.*;
  */
 public class MineField {
     private int noOfMines;
-    private int horizLength;
     private int vertLength;
+    private int horizLength;
     
     private JButton[][] btns;
     private String[][] btnInfo;
@@ -22,16 +22,16 @@ public class MineField {
      * values for the game
      */
     public MineField() {
-        noOfMines = 100;
-        horizLength = 25;
-        vertLength = 35;
+        noOfMines = 5;
+        vertLength = 25;
+        horizLength = 35;
         
-        btns = new JButton[horizLength][vertLength];
-        btnInfo = new String[horizLength][vertLength];
+        btns = new JButton[vertLength][horizLength];
+        btnInfo = new String[vertLength][horizLength];
         pnl = new JPanel();
         
-        for(int i = 0; i < horizLength; i++) {   
-            for(int j = 0; j < vertLength; j++) {
+        for(int i = 0; i < vertLength; i++) {   
+            for(int j = 0; j < horizLength; j++) {
                 btns[i][j] = new JButton("");
                 btnInfo[i][j] = "";
             }
@@ -47,12 +47,13 @@ public class MineField {
          * Generates a grid of user-specified dimensions  with a horizontal and
          * vertical gap of 5 between each element
          */
-        GridLayout layout = new GridLayout(horizLength, vertLength, 5, 5);
+        GridLayout layout = new GridLayout(vertLength, horizLength, 5, 5);
         pnl.setLayout(layout);
+        pnl.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         
         // Add buttons to grid
-        for(int i = 0; i < horizLength; i++) {   
-            for(int j = 0; j < vertLength; j++) {
+        for(int i = 0; i < vertLength; i++) {   
+            for(int j = 0; j < horizLength; j++) {
                 pnl.add(btns[i][j]);
             }
         }
@@ -71,8 +72,8 @@ public class MineField {
         
         for(int i = 0; i < noOfMines; i++) {
             do {
-                ranHoriz = (int) Math.floor(Math.random()*horizLength);
-                ranVert = (int) Math.floor(Math.random()*vertLength);
+                ranHoriz = (int) Math.floor(Math.random()*vertLength);
+                ranVert = (int) Math.floor(Math.random()*horizLength);
             } while(btnInfo[ranHoriz][ranVert].equals("M")); 
             btnInfo[ranHoriz][ranVert] = "M";
             //btns[ranHoriz][ranVert].setText(btnInfo[ranHoriz][ranVert]);
@@ -85,8 +86,8 @@ public class MineField {
      * @param game The class representing the game actions 
      */  
     public void createNumberedSpaces() {
-        for(int i = 0; i < horizLength; i++) {   
-            for(int j = 0; j < vertLength; j++) {
+        for(int i = 0; i < vertLength; i++) {   
+            for(int j = 0; j < horizLength; j++) {
                 if(!btnInfo[i][j].equals("M")) {
                     int mineCounter = countMines(i, j);
                     if(mineCounter != 0) {
@@ -124,6 +125,14 @@ public class MineField {
         return mineCounter;
     }
     
+    public void disableButtons() {
+        for(int i = 0; i < vertLength; i++) {
+            for(int j = 0; j < horizLength; j++) {
+                btns[i][j].setEnabled(false);
+            }
+        }
+    }
+    
     public int getNoOfMines() {
         return noOfMines;
     }
@@ -132,20 +141,20 @@ public class MineField {
         this.noOfMines = noOfMines;
     }
     
-    public int getHorizLength() {
-        return horizLength;
-    }
-    
-    public void setHorizLength(int horizLength) {
-        this.horizLength = horizLength;
-    }
-    
     public int getVertLength() {
         return vertLength;
     }
     
-    public void setVertLength(int vertLength) {
-        this.vertLength = vertLength;
+    public void setVertLength(int horizLength) {
+        this.vertLength = horizLength;
+    }
+    
+    public int getHorizLength() {
+        return horizLength;
+    }
+    
+    public void setHorizLength(int vertLength) {
+        this.horizLength = vertLength;
     }
     
     public JButton getButton(int x, int y) {

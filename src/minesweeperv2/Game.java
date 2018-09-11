@@ -12,57 +12,75 @@ import javax.swing.*;
 public class Game {
     private int correctFlags;
     private MineField mf;
+    JLayeredPane pane;
     
     public Game() {
         correctFlags = 0;
         mf = new MineField();
+        pane = new JLayeredPane();
+
     }
     
+    /*
+     * Starts a new game by creating a minefield and setting up action events
+     * @param frame The frame that the minefield will be added to
+     */
     public void newGame(JFrame frame) {
+        // Remove title screen to make way for layered pane
+        frame.getContentPane().removeAll();
+        frame.add(pane);
         mf.createField();
-        frame.add(mf.getPanel());
+        pane.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+        pane.add(mf.getPanel(), 0, 0);
+        
+        /* 
+         * As panels are not set using preferred size, this method does not
+         * resize the frame when called. The setExtendedState method is used
+         * to combat this.
+         */
+        frame.pack();
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        
         createActionEvents();
         createFlagEvents();
     }
     
+    public void createFinishMsg(String msg) {
+        JPanel finishPnl = new JPanel();
+        JLabel finishLbl = new JLabel(msg);
+        finishPnl.setSize(new Dimension(400, 200));
+        finishPnl.add(finishLbl);
+        pane.add(finishPnl, 1, 0);
+    }
+    
     /*
      * Conducts the lose sequence once a mine has been pushed by the player
-     * @param btns The two dimensional array of buttons on the grid
-     * @param btnInfo The two dimensional array of info related to each button
-     * @param horizLength The maximum length of the grid row
-     * @param vertLength The maximum length of the grid column
      */
     public void lose() {
         System.out.println("YOU LOSE");
-        for(int i = 0; i < mf.getHorizLength(); i++) {
-            for(int j = 0; j < mf.getVertLength(); j++) {
-                mf.getButton(i, j).setEnabled(false);
-            }
-        }
+        mf.disableButtons();
+        createFinishMsg("YOU LOSE");
     }
     
     /*
-     * Conducts the win sequence once flags have been put on all mines
+     * Checks whether enough all correct flags have been placed then conducts 
+     * win sequence
      */
-    public void win() {
-        
-    }
-    
     public void checkWin() {
         if(correctFlags == mf.getNoOfMines()) {
-            win();
+            System.out.println("You win");
+            mf.disableButtons();
+            createFinishMsg("YOU LOSE");
         }
     }
     
     /*
      * Generates action events for all buttons depending on the text displayed
      * upon them
-     * @param btns The two dimensional array of buttons on the grid
-     * @param btnInfo The two dimensional array of info related to each button
      */
     public void createActionEvents() {
-        for(int i = 0; i < mf.getHorizLength(); i++) {
-            for(int j = 0; j < mf.getVertLength(); j++) {
+        for(int i = 0; i < mf.getVertLength(); i++) {
+            for(int j = 0; j < mf.getHorizLength(); j++) {
                 final int ii = i;
                 final int jj = j;
                 final String btnText = mf.getButtonInfo(ii, jj);
@@ -100,22 +118,27 @@ public class Game {
     
     /*
      * Grants each button the ability to have flags through right clicking
-     * @param btns The two dimensional array of buttons on the grid
-     * @param btnInfo The two dimensional array of info related to each button
      */
     public void createFlagEvents() {
-        for(int i = 0; i < mf.getHorizLength(); i++) {
-            for(int j = 0; j < mf.getVertLength(); j++) {
+        for(int i = 0; i < mf.getVertLength(); i++) {
+            for(int j = 0; j < mf.getHorizLength(); j++) {
                 final String btnText = mf.getButtonInfo(i, j);
+                
                 mf.getButton(i, j).addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         if(e.getButton() == MouseEvent.BUTTON3) {
                             JButton btn = (JButton) e.getSource();
                             if(!btn.getText().equals("F")) {
                                 btn.setText("F");
-                                checkWin();
+                                if(btnText.equals("M")) {
+                                    correctFlags++;
+                                    checkWin();
+                                }
                             } else {
                                 btn.setText(btnText);
+                                if(btnText.equals("M")) {
+                                    correctFlags--;
+                                }
                             }
                         }
                     }
@@ -127,8 +150,6 @@ public class Game {
     /*
      * Performed if a button is selected which no mines in its vicinity, it
      * expands the safe area by locating other such buttons in the grid
-     * @param btns The two dimensional array of buttons on the grid
-     * @param btnInfo The two dimensional array of info related to each button
      * @param i The x coordinate of the chosen button
      * @param j The y coordinate of the chosen button
      */

@@ -2,6 +2,8 @@ package minesweeperv2;
 
 import java.awt.*;
 import java.awt.event.*;
+import javafx.geometry.*;
+import javafx.stage.*;
 import javax.swing.*;
 
 /*
@@ -16,19 +18,35 @@ public class MinesweeperV2 {
      * Creates the minesweeper game and shows it on screen
      */
     public MinesweeperV2() {
-        makeFrame();
-        makeMenuBar(frame);      
+        frame = new JFrame("Minesweeper");
+        frame.setPreferredSize(new Dimension(700, 500));
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                
+        JPanel titlePnl = makeTitleScreen();
+        frame.add(titlePnl);
+        makeMenuBar(); 
         
-        // Create instance of minefield here 
-        Game game = new Game();
-        game.newGame(frame);
+        // Set window size to account for different panel preferred sizes
+        frame.pack();
     }
 
+    /*
+     * Creates the title screen before you select to play the game
+     */
+    public JPanel makeTitleScreen() {
+        JPanel pnl = new JPanel();
+        JLabel title = new JLabel("Minesweeper");
+        pnl.add(title);
+        
+        return pnl;
+    }
+    
     /*
      * Create the main frame's menu bar.
      * @param frame The frame the menu bar should be added to.
      */
-    public void makeMenuBar(JFrame frame) {
+    public void makeMenuBar() {
         JMenuBar menubar = new JMenuBar();
         frame.setJMenuBar(menubar);
         
@@ -37,26 +55,19 @@ public class MinesweeperV2 {
         
         JMenuItem newItem = new JMenuItem("New");
         fileMenu.add(newItem);
+        newItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Game game = new Game();
+                game.newGame(frame);
+            }
+        });
         
         JMenuItem quitItem = new JMenuItem("Quit");
         fileMenu.add(quitItem);
     }
     
-    /*
-     * Create the main frame
-     */
-    public void makeFrame() {
-        frame = new JFrame("Minesweeper");
-        
-        // Sets window to already be in maximised mode
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-    
     public static void main(String[] args) {
         MinesweeperV2 minesweeper = new MinesweeperV2();
-        
     }
     
 }
