@@ -2,6 +2,8 @@ package minesweeperv2;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.*;
 import javafx.stage.*;
 import javax.swing.*;
@@ -13,7 +15,7 @@ import javax.swing.*;
  */
 public class MinesweeperV2 {
     private JFrame frame;
-    private Dimension screenSize;
+    private Dimension frameSize;
     
     /*
      * Creates the minesweeper game and shows it on screen
@@ -23,16 +25,53 @@ public class MinesweeperV2 {
         frame.setPreferredSize(new Dimension(700, 500));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                
+        
+        frameSize = frame.getSize();
         JPanel titlePnl = makeTitleScreen();
         frame.add(titlePnl);
         makeMenuBar(); 
+        frameResize();
         
         // Set window size to account for different panel preferred sizes
-        frame.pack();
-        
-        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.pack();        
     }
+    
+    public void frameResize() {
+        frame.addComponentListener(new ComponentListener() {
+            public void componentResized(ComponentEvent e) {
+                frameSize = new Dimension((int)(frame.getSize().getWidth()-10), 
+                        (int)(frame.getSize().getHeight()-20));
+                List<Component> compList =
+                        getChildComponents((Container) frame);
+                for(Component comp : compList) { 
+                    System.out.println(comp.getName());
+                    if(comp instanceof JPanel) {
+                        comp.setSize(frameSize);
+                    }
+                }
+                frame.revalidate();
+            }
+            @Override
+            public void componentMoved(ComponentEvent e) {}
+            @Override
+            public void componentShown(ComponentEvent e) {}
+            @Override
+            public void componentHidden(ComponentEvent e) {}
+        });
+    }
+    
+    public List<Component> getChildComponents(final Container c) {
+        Component[] comps = c.getComponents();
+        List<Component> compList = new ArrayList<>();
+        for(Component comp : comps) {
+            compList.add(comp);
+            if(comp instanceof Container) {
+                compList.addAll(getChildComponents((Container) comp));
+            }
+        }
+        return compList;
+    }
+    
 
     /*
      * Creates the title screen before you select to play the game
@@ -61,7 +100,7 @@ public class MinesweeperV2 {
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Game game = new Game();
-                game.newGame(frame);
+                game.newGame(frame, frameSize);
             }
         });
         

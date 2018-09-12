@@ -26,16 +26,15 @@ public class Game {
      * Starts a new game by creating a minefield and setting up action events
      * @param frame The frame that the minefield will be added to
      */
-    public void newGame(JFrame frame) {    
+    public void newGame(JFrame frame, Dimension frameSize) {    
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frameSize = frame.getSize();
+        this.frameSize = frameSize;
         
         // Remove title screen to make way for layered pane
         frame.getContentPane().removeAll();
-        frame.add(pane);
+        frame.add(pane, BorderLayout.CENTER);
         mf.createField(frameSize);
-        pane.setPreferredSize(frameSize);
-        pane.add(mf.getPanel(), 0, 0);       
+        pane.add(mf.getPanel(), 0, 0);   
         frame.pack();
 
         createActionEvents();
