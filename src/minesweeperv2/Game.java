@@ -135,10 +135,16 @@ public class Game {
                 
                 mf.getButton(x, y).addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
+                        
                         if(e.getButton() == MouseEvent.BUTTON3) {
                             JButton btn = (JButton) e.getSource();
+                            
                             if(!btn.getText().equals("F")) {
                                 btn.setText("F");
+                                ActionListener[] als = btn.getActionListeners();
+                                for(ActionListener a : als) {
+                                    btn.removeActionListener(a);
+                                }
                                 if(btnText.equals("M")) {
                                     correctFlags++;
                                     checkWin();
@@ -148,6 +154,7 @@ public class Game {
                                 if(btnText.equals("M")) {
                                     correctFlags--;
                                 }
+                                createActionEvents();
                             }
                         }
                     }
