@@ -1,12 +1,13 @@
 package minesweeperv2;
 
+// Imports for window
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+
 import java.util.List;
 import java.util.ArrayList;
-import javafx.geometry.*;
-import javafx.stage.*;
-import javax.swing.*;
+
 
 /*
  * This project attempts to improve upon my initial attempt of designing 
@@ -29,12 +30,10 @@ public class MinesweeperV2 {
         frame.setPreferredSize(new Dimension(700, 500));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
         frameSize = frame.getSize();
-        JPanel titlePnl = makeTitleScreen();
-        frame.add(titlePnl);
+        makeTitleScreen();
         makeMenuBar(); 
-        frameResize();
+        createFrameResizeListener();
         
         // Set window size to account for different panel preferred sizes
         frame.pack();        
@@ -43,7 +42,7 @@ public class MinesweeperV2 {
     /*
      * Resizes the components within the frame when it is resized by the user
      */
-    public void frameResize() {
+    public void createFrameResizeListener() {
         frame.addComponentListener(new ComponentListener() {
             public void componentResized(ComponentEvent e) {
                 int frameWidth = 
@@ -54,11 +53,11 @@ public class MinesweeperV2 {
                 List<Component> compList =
                         getChildComponents((Container) frame);
                 for(Component comp : compList) { 
-//                    System.out.println(comp.getName());
                     if(comp instanceof JPanel) {
                         comp.setSize(frameSize);
                     }
                 }
+                // Updates changes upon screen straight away
                 frame.revalidate();
             }
             @Override
@@ -86,7 +85,6 @@ public class MinesweeperV2 {
         return compList;
     }
     
-
     /*
      * Creates the title screen before you select to play the game
      */
@@ -94,7 +92,7 @@ public class MinesweeperV2 {
         JPanel pnl = new JPanel();
         JLabel title = new JLabel("Minesweeper");
         pnl.add(title);
-        
+        frame.add(pnl);
         return pnl;
     }
     

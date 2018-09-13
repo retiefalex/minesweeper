@@ -29,69 +29,47 @@ public class Game {
      * @param frame The frame that the minefield will be added to
      */
     public void newGame(JFrame frame) {   
+        int frameWidth = (int)frame.getSize().getWidth()
+                -MinesweeperV2.WIDTH_OVERLAP;
+        int frameHeight = (int)frame.getSize().getHeight()
+                -MinesweeperV2.HEIGHT_OVERLAP;
+        Dimension frameSize = new Dimension(frameWidth, frameHeight);
         
         // Remove title screen to make way for layered pane
         frame.getContentPane().removeAll();
         frame.add(pane, BorderLayout.CENTER);
-        mf.createField(frame);
-        frame.revalidate();
-
+        mf.createField(frameSize);
         createActionEvents();
         createFlagEvents();
-        createFinishPnls(frame);
+        createFinishPnls(frameSize);
         pane.add(winPnl, 0, 0);   
         pane.add(losePnl, 1, 0);   
         pane.add(mf.getPanel(), 2, 0);
+        frame.revalidate();
     }
     
     /*
-     * Creates the final message after you either win or lose the game
-     * @param msg String referring to whether you lost or won the game
+     * Creates two panels, one displaying a winning message and the other a
+     * losing message
+     * @param frameSize The dimensions of the frame
      */
-    public void createFinishPnls(JFrame frame) {
+    public void createFinishPnls(Dimension frameSize) {
         JLabel winLbl = new JLabel("YOU WIN!");
         JLabel loseLbl = new JLabel("YOU LOSE!");
         winLbl.setFont(new Font(null, Font.PLAIN, 40));
         loseLbl.setFont(new Font(null, Font.PLAIN, 40));
-        int width = (int)frame.getSize().getWidth()
-                -MinesweeperV2.WIDTH_OVERLAP;
-        int height = (int)frame.getSize().getHeight()
-                -MinesweeperV2.HEIGHT_OVERLAP;
         
         // Gridbag layout centres the label
         winPnl.setLayout(new GridBagLayout());
-        winPnl.setSize(width, height);
+        winPnl.setSize(frameSize);
         winPnl.setOpaque(false);
         winPnl.add(winLbl);
         losePnl.setLayout(new GridBagLayout());
-        losePnl.setSize(width, height);
+        losePnl.setSize(frameSize);
         losePnl.setOpaque(false);
         losePnl.add(loseLbl);
-        
-        frame.revalidate();
     }
-    
-//    /*
-//     * Creates the final message after you either win or lose the game
-//     * @param msg String referring to whether you lost or won the game
-//     */
-//    public void createFinishMsg(String msg) {
-//        JPanel finishPnl = new JPanel();
-//        JLabel finishLbl = new JLabel(msg);
-//        int width = (int)frame.getSize().getWidth();
-//        int height = (int)frame.getSize().getHeight();
-//        finishLbl.setFont(new Font(null, Font.PLAIN, 40));
-//        
-//        // Gridbag layout centres the label
-//        finishPnl.setLayout(new GridBagLayout());
-//        finishPnl.setSize(width, height);
-//        finishPnl.setOpaque(false);
-//        finishPnl.add(finishLbl);
-//        pane.add(finishPnl, 1, 0);
-//        
-//        frame.revalidate();
-//    }
-    
+
     /*
      * Conducts the lose sequence once a mine has been pushed by the player
      */
@@ -118,14 +96,14 @@ public class Game {
      * upon them
      */
     public void createActionEvents() {
-        for(int i = 0; i < mf.getVertLength(); i++) {
-            for(int j = 0; j < mf.getHorizLength(); j++) {
-                final int ii = i;
-                final int jj = j;
-                final String btnText = mf.getButtonInfo(ii, jj);
+        for(int x = 0; x < mf.getVertLength(); x++) {
+            for(int y = 0; y < mf.getHorizLength(); y++) {
+                final int i = x;
+                final int j = y;
+                final String btnText = mf.getButtonInfo(i, j);
                 
                 if(btnText.equals("M")) {
-                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
+                    mf.getButton(i, j).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             //System.out.println("M");
                             JButton btn = (JButton) e.getSource();
@@ -135,14 +113,14 @@ public class Game {
                         }
                     });
                 } else if(btnText.equals("")){
-                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
+                    mf.getButton(i, j).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             //System.out.println("0");
-                            expandSafeZone(ii, jj);
+                            expandSafeZone(i, j);
                         }
                     });
                 } else {
-                    mf.getButton(ii, jj).addActionListener(new ActionListener() {
+                    mf.getButton(i, j).addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             //System.out.println("123");
                             JButton btn = (JButton) e.getSource();
@@ -159,11 +137,11 @@ public class Game {
      * Grants each button the ability to have flags through right clicking
      */
     public void createFlagEvents() {
-        for(int i = 0; i < mf.getVertLength(); i++) {
-            for(int j = 0; j < mf.getHorizLength(); j++) {
-                final String btnText = mf.getButtonInfo(i, j);
+        for(int x = 0; x < mf.getVertLength(); x++) {
+            for(int y = 0; y < mf.getHorizLength(); y++) {
+                final String btnText = mf.getButtonInfo(x, y);
                 
-                mf.getButton(i, j).addMouseListener(new MouseAdapter() {
+                mf.getButton(x, y).addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         if(e.getButton() == MouseEvent.BUTTON3) {
                             JButton btn = (JButton) e.getSource();
@@ -189,24 +167,24 @@ public class Game {
     /*
      * Performed if a button is selected which no mines in its vicinity, it
      * expands the safe area by locating other such buttons in the grid
-     * @param i The x coordinate of the chosen button
-     * @param j The y coordinate of the chosen button
+     * @param x The x coordinate of the chosen button
+     * @param y The y coordinate of the chosen button
      */
-    public void expandSafeZone(int i, int j) {
-        mf.getButton(i, j).setEnabled(false);
-        for(int ii = i-1; ii <= i+1; ii++) {
-            for(int jj = j-1; jj <= j+1; jj++) {
-                if(!(ii == i && jj == j)) {
+    public void expandSafeZone(int x, int y) {
+        mf.getButton(x, y).setEnabled(false);
+        for(int i = x-1; i <= x+1; i++) {
+            for(int j = y-1; j <= y+1; j++) {
+                if(!(i == x && j == y)) {
                     try {
-                        if(mf.getButtonInfo(ii, jj).equals("") &&
-                                mf.getButton(ii, jj).isEnabled()) { 
-                            mf.getButton(ii, jj).setEnabled(false);
-                            expandSafeZone(ii, jj);
-                        } else if(mf.getButtonInfo(ii, jj).equals("M")) {
+                        if(mf.getButtonInfo(i, j).equals("") &&
+                                mf.getButton(i, j).isEnabled()) { 
+                            mf.getButton(i, j).setEnabled(false);
+                            expandSafeZone(i, j);
+                        } else if(mf.getButtonInfo(i, j).equals("M")) {
                             // Keep mine hidden by doing nothing
                         } else {
-                            mf.setButtonText(mf.getButtonInfo(ii, jj), ii, jj);
-                            mf.getButton(ii, jj).setEnabled(false);
+                            mf.setButtonText(mf.getButtonInfo(i, j), i, j);
+                            mf.getButton(i, j).setEnabled(false);
                         }
                     } catch(ArrayIndexOutOfBoundsException exception) {
                         // ignore buttons referenced outside the grid border

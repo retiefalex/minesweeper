@@ -23,8 +23,8 @@ public class MineField {
      */
     public MineField() {
         noOfMines = 5;
-        vertLength = 5;
-        horizLength = 10;
+        vertLength = 25;
+        horizLength = 35;
         
         btns = new JButton[vertLength][horizLength];
         btnInfo = new String[vertLength][horizLength];
@@ -40,20 +40,16 @@ public class MineField {
     
     /*
      * Create grid of buttons to be placed on the panel
-     * @param frame The frame in which 
+     * @param frameSize The dimensions of the frame
      */
-    public void createField(JFrame frame) {
+    public void createField(Dimension frameSize) {
         /*
          * Generates a grid of user-specified dimensions  with a horizontal and
          * vertical gap of 5 between each element
          */
         GridLayout layout = new GridLayout(vertLength, horizLength, 5, 5);
         pnl.setLayout(layout);
-        int width = (int)frame.getSize().getWidth()
-                -MinesweeperV2.WIDTH_OVERLAP;
-        int height = (int)frame.getSize().getHeight()
-                -MinesweeperV2.HEIGHT_OVERLAP;
-        pnl.setSize(new Dimension(width, height));
+        pnl.setSize(frameSize);
         
         // Add buttons to grid
         for(int i = 0; i < vertLength; i++) {   
