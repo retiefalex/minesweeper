@@ -17,6 +17,10 @@ public class MinesweeperV2 {
     private JFrame frame;
     private Dimension frameSize;
     
+    // Integers mark the difference between the frame size and the panel size
+    static final int WIDTH_OVERLAP = 15;
+    static final int HEIGHT_OVERLAP = 63;
+    
     /*
      * Creates the minesweeper game and shows it on screen
      */
@@ -36,15 +40,21 @@ public class MinesweeperV2 {
         frame.pack();        
     }
     
+    /*
+     * Resizes the components within the frame when it is resized by the user
+     */
     public void frameResize() {
         frame.addComponentListener(new ComponentListener() {
             public void componentResized(ComponentEvent e) {
-                frameSize = new Dimension((int)(frame.getSize().getWidth()-10), 
-                        (int)(frame.getSize().getHeight()-20));
+                int frameWidth = 
+                        (int)(frame.getSize().getWidth()-WIDTH_OVERLAP);
+                int frameHeight = 
+                        (int)(frame.getSize().getHeight()-HEIGHT_OVERLAP);
+                frameSize = new Dimension(frameWidth, frameHeight);
                 List<Component> compList =
                         getChildComponents((Container) frame);
                 for(Component comp : compList) { 
-                    System.out.println(comp.getName());
+//                    System.out.println(comp.getName());
                     if(comp instanceof JPanel) {
                         comp.setSize(frameSize);
                     }
@@ -60,6 +70,10 @@ public class MinesweeperV2 {
         });
     }
     
+    /*
+     * Lists all the components within the frame including sub components
+     * @param c Container in which the child components are to be found from
+     */
     public List<Component> getChildComponents(final Container c) {
         Component[] comps = c.getComponents();
         List<Component> compList = new ArrayList<>();
@@ -86,7 +100,6 @@ public class MinesweeperV2 {
     
     /*
      * Create the main frame's menu bar.
-     * @param frame The frame the menu bar should be added to.
      */
     public void makeMenuBar() {
         JMenuBar menubar = new JMenuBar();
@@ -100,7 +113,7 @@ public class MinesweeperV2 {
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Game game = new Game();
-                game.newGame(frame, frameSize);
+                game.newGame(frame);
             }
         });
         

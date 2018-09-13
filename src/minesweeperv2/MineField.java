@@ -40,16 +40,20 @@ public class MineField {
     
     /*
      * Create grid of buttons to be placed on the panel
-     * @param pnl The panel the grid of buttons is to be added to
+     * @param frame The frame in which 
      */
-    public void createField(Dimension frameSize) {
+    public void createField(JFrame frame) {
         /*
          * Generates a grid of user-specified dimensions  with a horizontal and
          * vertical gap of 5 between each element
          */
         GridLayout layout = new GridLayout(vertLength, horizLength, 5, 5);
         pnl.setLayout(layout);
-        pnl.setSize(frameSize);
+        int width = (int)frame.getSize().getWidth()
+                -MinesweeperV2.WIDTH_OVERLAP;
+        int height = (int)frame.getSize().getHeight()
+                -MinesweeperV2.HEIGHT_OVERLAP;
+        pnl.setSize(new Dimension(width, height));
         
         // Add buttons to grid
         for(int i = 0; i < vertLength; i++) {   

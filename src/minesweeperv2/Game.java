@@ -13,49 +13,84 @@ public class Game {
     private int correctFlags;
     private MineField mf;
     private JLayeredPane pane;
-    private Dimension frameSize;
+    private JPanel winPnl;
+    private JPanel losePnl;
     
     public Game() {
         correctFlags = 0;
         mf = new MineField();
         pane = new JLayeredPane();
-        frameSize = new Dimension();
+        winPnl = new JPanel();
+        losePnl = new JPanel();
     }
     
     /*
      * Starts a new game by creating a minefield and setting up action events
      * @param frame The frame that the minefield will be added to
      */
-    public void newGame(JFrame frame, Dimension frameSize) {    
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        this.frameSize = frameSize;
+    public void newGame(JFrame frame) {   
         
         // Remove title screen to make way for layered pane
         frame.getContentPane().removeAll();
         frame.add(pane, BorderLayout.CENTER);
-        mf.createField(frameSize);
-        pane.add(mf.getPanel(), 0, 0);   
-        frame.pack();
+        mf.createField(frame);
+        frame.revalidate();
 
         createActionEvents();
         createFlagEvents();
+        createFinishPnls(frame);
+        pane.add(winPnl, 0, 0);   
+        pane.add(losePnl, 1, 0);   
+        pane.add(mf.getPanel(), 2, 0);
     }
     
-    public void createFinishMsg(String msg) {
-        JPanel finishPnl = new JPanel();
-        JLabel finishLbl = new JLabel(msg);
-        int width = (int)frameSize.getWidth();
-        int height = (int)frameSize.getHeight();
-        finishLbl.setFont(new Font(null, Font.PLAIN, 40));
+    /*
+     * Creates the final message after you either win or lose the game
+     * @param msg String referring to whether you lost or won the game
+     */
+    public void createFinishPnls(JFrame frame) {
+        JLabel winLbl = new JLabel("YOU WIN!");
+        JLabel loseLbl = new JLabel("YOU LOSE!");
+        winLbl.setFont(new Font(null, Font.PLAIN, 40));
+        loseLbl.setFont(new Font(null, Font.PLAIN, 40));
+        int width = (int)frame.getSize().getWidth()
+                -MinesweeperV2.WIDTH_OVERLAP;
+        int height = (int)frame.getSize().getHeight()
+                -MinesweeperV2.HEIGHT_OVERLAP;
         
         // Gridbag layout centres the label
-        finishPnl.setLayout(new GridBagLayout());
-        finishPnl.setBounds(0, 0, width, height);
-        finishPnl.setOpaque(false);
+        winPnl.setLayout(new GridBagLayout());
+        winPnl.setSize(width, height);
+        winPnl.setOpaque(false);
+        winPnl.add(winLbl);
+        losePnl.setLayout(new GridBagLayout());
+        losePnl.setSize(width, height);
+        losePnl.setOpaque(false);
+        losePnl.add(loseLbl);
         
-        finishPnl.add(finishLbl);
-        pane.add(finishPnl, 1, 0);
+        frame.revalidate();
     }
+    
+//    /*
+//     * Creates the final message after you either win or lose the game
+//     * @param msg String referring to whether you lost or won the game
+//     */
+//    public void createFinishMsg(String msg) {
+//        JPanel finishPnl = new JPanel();
+//        JLabel finishLbl = new JLabel(msg);
+//        int width = (int)frame.getSize().getWidth();
+//        int height = (int)frame.getSize().getHeight();
+//        finishLbl.setFont(new Font(null, Font.PLAIN, 40));
+//        
+//        // Gridbag layout centres the label
+//        finishPnl.setLayout(new GridBagLayout());
+//        finishPnl.setSize(width, height);
+//        finishPnl.setOpaque(false);
+//        finishPnl.add(finishLbl);
+//        pane.add(finishPnl, 1, 0);
+//        
+//        frame.revalidate();
+//    }
     
     /*
      * Conducts the lose sequence once a mine has been pushed by the player
@@ -63,7 +98,7 @@ public class Game {
     public void lose() {
         System.out.println("YOU LOSE!");
         mf.disableButtons();
-        createFinishMsg("YOU LOSE!");
+        pane.setLayer(losePnl, 3);
     }
     
     /*
@@ -74,7 +109,7 @@ public class Game {
         if(correctFlags == mf.getNoOfMines()) {
             System.out.println("YOU WIN!");
             mf.disableButtons();
-            createFinishMsg("YOU WIN!");
+            pane.setLayer(winPnl, 3);
         }
     }
     
