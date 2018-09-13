@@ -36,7 +36,9 @@ public class MinesweeperV2 {
         createFrameResizeListener();
         
         // Set window size to account for different panel preferred sizes
-        frame.pack();        
+        frame.pack(); 
+        // Makes the window appear in the centre of the screen
+        frame.setLocationRelativeTo(null);
     }
     
     /*
