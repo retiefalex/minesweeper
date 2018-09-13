@@ -70,6 +70,7 @@ public class Game {
         losePnl.add(loseLbl);
     }
 
+    
     /*
      * Conducts the lose sequence once a mine has been pushed by the player
      */
