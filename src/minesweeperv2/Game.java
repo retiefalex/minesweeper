@@ -100,35 +100,27 @@ public class Game {
             for(int y = 0; y < mf.getHorizLength(); y++) {
                 final int i = x;
                 final int j = y;
-                final String btnText = mf.getButtonInfo(i, j);
-                
-                if(btnText.equals("M")) {
-                    mf.getButton(i, j).addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            //System.out.println("M");
+                final String btnInfoText = mf.getButtonInfo(i, j);
+
+                mf.getButton(i, j).addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        
+                        if(btnInfoText.equals("M")) {
                             JButton btn = (JButton) e.getSource();
-                            btn.setText(btnText);
+                            btn.setText(btnInfoText);
                             btn.setEnabled(false);
                             lose();
-                        }
-                    });
-                } else if(btnText.equals("")){
-                    mf.getButton(i, j).addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            //System.out.println("0");
+                            
+                        } else if(btnInfoText.equals("")) {
                             expandSafeZone(i, j);
-                        }
-                    });
-                } else {
-                    mf.getButton(i, j).addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            //System.out.println("123");
+                                                        
+                        } else {
                             JButton btn = (JButton) e.getSource();
-                            btn.setText(btnText);
+                            btn.setText(btnInfoText);
                             btn.setEnabled(false);
                         }
-                    });
-                }
+                    }
+                });
             }   
         }    
     }
